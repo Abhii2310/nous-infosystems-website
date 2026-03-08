@@ -1,470 +1,442 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
-import { ArrowRight, ExternalLink, Award, TrendingUp, CheckCircle, Star, Zap, Globe } from 'lucide-react';
+import { useRef, useState, useEffect } from 'react';
+import { motion, useInView } from 'framer-motion';
+
+// ─── Real brand SVG logos ────────────────────────────────────────
+const BrandLogos: Record<string, React.FC<{ size?: number }>> = {
+    Microsoft: ({ size = 28 }) => (
+        <svg width={size} height={size} viewBox="0 0 23 23" fill="none">
+            <rect x="0" y="0" width="11" height="11" fill="#f25022" />
+            <rect x="12" y="0" width="11" height="11" fill="#7fba00" />
+            <rect x="0" y="12" width="11" height="11" fill="#00a4ef" />
+            <rect x="12" y="12" width="11" height="11" fill="#ffb900" />
+        </svg>
+    ),
+    Google: ({ size = 28 }) => (
+        <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
+            <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.654 33.655 29.28 37 24 37c-7.18 0-13-5.82-13-13s5.82-13 13-13c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" />
+            <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" />
+            <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0124 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" />
+            <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 01-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" />
+        </svg>
+    ),
+    AWS: ({ size = 28 }) => (
+        <svg width={size * 1.6} height={size} viewBox="0 0 80 48" fill="none">
+            <text x="0" y="34" fontSize="32" fontWeight="900" fill="#FF9900" fontFamily="Arial">aws</text>
+        </svg>
+    ),
+    Salesforce: ({ size = 28 }) => (
+        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+            <ellipse cx="50" cy="50" rx="50" ry="50" fill="#00A1E0" />
+            <text x="50" y="64" textAnchor="middle" fontSize="40" fontWeight="900" fill="white" fontFamily="Arial">sf</text>
+        </svg>
+    ),
+    Databricks: ({ size = 28 }) => (
+        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+            <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="#FF3621" />
+            <polygon points="50,20 80,36 80,68 50,84 20,68 20,36" fill="#FF6B50" opacity="0.6" />
+            <text x="50" y="60" textAnchor="middle" fontSize="26" fontWeight="900" fill="white" fontFamily="Arial">Db</text>
+        </svg>
+    ),
+    Snowflake: ({ size = 28 }) => (
+        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+            <text x="50" y="68" textAnchor="middle" fontSize="52" fill="#29B5E8">❄</text>
+        </svg>
+    ),
+    ServiceNow: ({ size = 28 }) => (
+        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+            <circle cx="50" cy="50" r="48" fill="#62D84E" />
+            <text x="50" y="64" textAnchor="middle" fontSize="30" fontWeight="900" fill="white" fontFamily="Arial">Now</text>
+        </svg>
+    ),
+    MuleSoft: ({ size = 28 }) => (
+        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+            <circle cx="50" cy="50" r="48" fill="#00B3E6" />
+            <text x="50" y="64" textAnchor="middle" fontSize="32" fontWeight="900" fill="white" fontFamily="Arial">MS</text>
+        </svg>
+    ),
+    OpenAI: ({ size = 28 }) => (
+        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+            <circle cx="50" cy="50" r="48" fill="#0a0a0a" />
+            <text x="50" y="64" textAnchor="middle" fontSize="28" fontWeight="700" fill="white" fontFamily="Arial">⬡</text>
+        </svg>
+    ),
+    Azure: ({ size = 28 }) => (
+        <svg width={size} height={size} viewBox="0 0 96 96" fill="none">
+            <defs>
+                <linearGradient id="azGrad" x1="0" y1="0" x2="96" y2="96" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stopColor="#0072c6" />
+                    <stop offset="100%" stopColor="#00b4ff" />
+                </linearGradient>
+            </defs>
+            <path d="M33.338 6.404L5.993 71.641l24.71-.001L55.03 23.658zm1.27 16.716L8.58 89.596h54.06L33.608 23.12z" fill="url(#azGrad)" />
+            <path d="M57.642 14.404L37.11 72.22l19.252.001L90 89.596H44.948l-6.36 17.404h57.404z" fill="#0072c6" opacity="0.8" />
+        </svg>
+    ),
+};
 
 const partners = [
-    {
-        name: 'Microsoft',
-        tier: 'Gold Partner',
-        tierColor: '#F59E0B',
-        tierBg: 'rgba(245,158,11,0.12)',
-        color: '#00A4EF',
-        gradient: 'linear-gradient(135deg, #00A4EF20, #FFB90015)',
-        border: 'rgba(0,164,239,0.25)',
-        abbr: 'MS',
-        desc: 'Azure Cloud & Modern Work',
-        highlight: '19-year alliance',
-        icon: '🪟',
-    },
-    {
-        name: 'Amazon AWS',
-        tier: 'Select Partner',
-        tierColor: '#FF9900',
-        tierBg: 'rgba(255,153,0,0.12)',
-        color: '#FF9900',
-        gradient: 'linear-gradient(135deg, #FF990020, #FF990005)',
-        border: 'rgba(255,153,0,0.25)',
-        abbr: 'aws',
-        desc: 'Cloud Infrastructure & AI',
-        highlight: 'AWS Select Consulting',
-        icon: '☁️',
-    },
-    {
-        name: 'Google Cloud',
-        tier: 'Partner',
-        tierColor: '#4285F4',
-        tierBg: 'rgba(66,133,244,0.12)',
-        color: '#4285F4',
-        gradient: 'linear-gradient(135deg, #4285F420, #34A85310)',
-        border: 'rgba(66,133,244,0.25)',
-        abbr: 'GCP',
-        desc: 'BigQuery & Vertex AI',
-        highlight: 'Vertex AI Specialist',
-        icon: '🔍',
-    },
-    {
-        name: 'Salesforce',
-        tier: 'Consulting Partner',
-        tierColor: '#00A1E0',
-        tierBg: 'rgba(0,161,224,0.12)',
-        color: '#00A1E0',
-        gradient: 'linear-gradient(135deg, #00A1E020, #00A1E005)',
-        border: 'rgba(0,161,224,0.25)',
-        abbr: 'SF',
-        desc: 'CRM & Platform Engineering',
-        highlight: 'Sales & Service Cloud',
-        icon: '⚡',
-    },
-    {
-        name: 'ServiceNow',
-        tier: 'Partner',
-        tierColor: '#62D84E',
-        tierBg: 'rgba(98,216,78,0.12)',
-        color: '#38A169',
-        gradient: 'linear-gradient(135deg, #62D84E20, #62D84E05)',
-        border: 'rgba(98,216,78,0.25)',
-        abbr: 'SN',
-        desc: 'IT Service Management',
-        highlight: 'ITSM Specialist',
-        icon: '🔧',
-    },
-    {
-        name: 'Snowflake',
-        tier: 'Partner',
-        tierColor: '#29B5E8',
-        tierBg: 'rgba(41,181,232,0.12)',
-        color: '#29B5E8',
-        gradient: 'linear-gradient(135deg, #29B5E820, #29B5E805)',
-        border: 'rgba(41,181,232,0.25)',
-        abbr: 'SF❄',
-        desc: 'Data Cloud Platform',
-        highlight: 'Data Migrations Expert',
-        icon: '❄️',
-    },
-    {
-        name: 'Databricks',
-        tier: 'Partner',
-        tierColor: '#FF3621',
-        tierBg: 'rgba(255,54,33,0.12)',
-        color: '#FF3621',
-        gradient: 'linear-gradient(135deg, #FF362120, #FF362105)',
-        border: 'rgba(255,54,33,0.25)',
-        abbr: 'Db',
-        desc: 'Data & AI Lakehouse',
-        highlight: 'Lakehouse Architecture',
-        icon: '🧱',
-    },
-    {
-        name: 'MuleSoft',
-        tier: 'Partner',
-        tierColor: '#00B3E6',
-        tierBg: 'rgba(0,179,230,0.12)',
-        color: '#00B3E6',
-        gradient: 'linear-gradient(135deg, #00B3E620, #00B3E605)',
-        border: 'rgba(0,179,230,0.25)',
-        abbr: 'Mu',
-        desc: 'Integration & API Platform',
-        highlight: 'API-first Integration',
-        icon: '🔗',
-    },
+    { name: 'Microsoft', logo: 'Microsoft', tagline: 'Azure partner' },
+    { name: 'Google Cloud', logo: 'Google', tagline: 'Premier partner' },
+    { name: 'AWS', logo: 'AWS', tagline: 'Select partner' },
+    { name: 'Salesforce', logo: 'Salesforce', tagline: 'ISV partner' },
+    { name: 'Databricks', logo: 'Databricks', tagline: 'Technology partner' },
+    { name: 'Snowflake', logo: 'Snowflake', tagline: 'Elite partner' },
+    { name: 'ServiceNow', logo: 'ServiceNow', tagline: 'Build partner' },
+    { name: 'OpenAI', logo: 'OpenAI', tagline: 'API partner' },
+    { name: 'Azure', logo: 'Azure', tagline: 'Gold partner' },
 ];
 
-const ecosystemStats = [
-    { value: '8+', label: 'Technology Partners', icon: Globe },
-    { value: '19', label: 'Years with Microsoft', icon: Award },
-    { value: '40+', label: 'Joint Certifications', icon: CheckCircle },
-    { value: '100%', label: 'Cross-Platform Coverage', icon: Star },
-];
+// ─── Marquee ticker ──────────────────────────────────────────────
+function Marquee() {
+    const items = [...partners, ...partners]; // double for seamless loop
+    return (
+        <div style={{ overflow: 'hidden', position: 'relative' }}>
+            {/* fade edges */}
+            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 80, background: 'linear-gradient(to right, #fff, transparent)', zIndex: 2, pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 80, background: 'linear-gradient(to left, #fff, transparent)', zIndex: 2, pointerEvents: 'none' }} />
 
-const caseStudies = [
-    {
-        industry: 'Banking',
-        color: '#1A56DB',
-        bg: 'rgba(26,86,219,0.06)',
-        bgHover: 'rgba(26,86,219,0.10)',
-        title: 'Core Banking Modernization for a UK Tier-1 Bank',
-        desc: 'Migrated a monolithic core ledger to event-driven microservices — achieving zero-downtime cutover for 4M+ customer accounts.',
-        metrics: ['0 downtime', '60% faster settlement', 'ISO 27001 compliant'],
-        tech: ['Azure', 'Kafka', 'Spring Boot'],
-    },
-    {
-        industry: 'Insurance',
-        color: '#0891B2',
-        bg: 'rgba(8,145,178,0.06)',
-        bgHover: 'rgba(8,145,178,0.10)',
-        title: 'Claims Automation Platform for Global Insurer',
-        desc: 'Built an ML-powered claims triage system that reduced claims processing cycle from 14 days to 3 days across 8 markets.',
-        metrics: ['78% faster claims', '$12M annual savings', '99.98% uptime'],
-        tech: ['AWS', 'Python ML', 'Snowflake'],
-    },
-    {
-        industry: 'Healthcare',
-        color: '#059669',
-        bg: 'rgba(5,150,105,0.06)',
-        bgHover: 'rgba(5,150,105,0.10)',
-        title: 'HIPAA-Compliant Clinical Data Exchange',
-        desc: 'Designed and deployed a HL7 FHIR-compliant patient data platform serving 300+ hospital systems across the US.',
-        metrics: ['300+ hospitals', 'Full HIPAA compliance', '40M+ records managed'],
-        tech: ['GCP', 'HL7 FHIR', 'BigQuery'],
-    },
-];
+            <motion.div
+                animate={{ x: ['0%', '-50%'] }}
+                transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
+                style={{ display: 'flex', gap: 16, width: 'max-content' }}
+            >
+                {items.map((p, i) => {
+                    const Logo = BrandLogos[p.logo];
+                    return (
+                        <div key={`${p.name}-${i}`} style={{
+                            display: 'flex', alignItems: 'center', gap: 12,
+                            padding: '12px 24px', borderRadius: 14,
+                            background: '#fafbff',
+                            border: '1px solid rgba(0,0,0,0.07)',
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0,
+                        }}>
+                            {Logo && <Logo size={22} />}
+                            <div>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: '#0a0f1e' }}>{p.name}</div>
+                                <div style={{ fontSize: 11, color: '#9ca3af', fontWeight: 500 }}>{p.tagline}</div>
+                            </div>
+                        </div>
+                    );
+                })}
+            </motion.div>
+        </div>
+    );
+}
+
+// ─── Animated network diagram SVG ────────────────────────────────
+function NetworkDiagram() {
+    const [phase, setPhase] = useState(0);
+    useEffect(() => {
+        const t = setInterval(() => setPhase((p) => (p + 1) % 7), 1600);
+        return () => clearInterval(t);
+    }, []);
+
+    const nodes = [
+        { cx: 120, cy: 120, label: 'Ingest', color: '#6366f1' },
+        { cx: 320, cy: 80, label: 'Process', color: '#3b82f6' },
+        { cx: 520, cy: 140, label: 'AI Agent', color: '#06b6d4' },
+        { cx: 320, cy: 240, label: 'Enrich', color: '#14b8a6' },
+        { cx: 120, cy: 280, label: 'Monitor', color: '#8b5cf6' },
+        { cx: 520, cy: 300, label: 'Deploy', color: '#e879f9' },
+    ];
+    const edges = [[0, 1], [1, 2], [1, 3], [2, 5], [3, 4], [3, 5], [0, 4]];
+
+    return (
+        <div style={{ position: 'relative', width: '100%', height: 380 }}>
+            <svg viewBox="0 0 640 380" style={{ width: '100%', height: '100%' }}>
+                <defs>
+                    <linearGradient id="edgeGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#6366f1" stopOpacity="0.7" />
+                        <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.7" />
+                    </linearGradient>
+                    <filter id="nodeGlow">
+                        <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                        <feMerge><feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                    </filter>
+                </defs>
+
+                {edges.map(([a, b], i) => {
+                    const na = nodes[a], nb = nodes[b];
+                    const active = i === phase;
+                    return (
+                        <line key={i}
+                            x1={na.cx} y1={na.cy} x2={nb.cx} y2={nb.cy}
+                            stroke={active ? 'url(#edgeGrad2)' : 'rgba(99,102,241,0.1)'}
+                            strokeWidth={active ? 2 : 1}
+                            style={{ transition: 'stroke 0.4s, stroke-width 0.4s' }}
+                        />
+                    );
+                })}
+
+                {edges.map(([a, b], i) => {
+                    if (i !== phase) return null;
+                    const na = nodes[a], nb = nodes[b];
+                    return (
+                        <circle key={`dot-${i}`} r="5" fill="#6366f1" filter="url(#nodeGlow)">
+                            <animateMotion dur="1.6s" repeatCount="indefinite">
+                                <mpath href={`#netpath-${i}`} />
+                            </animateMotion>
+                        </circle>
+                    );
+                })}
+
+                {edges.map(([a, b], i) => {
+                    const na = nodes[a], nb = nodes[b];
+                    return <path key={`path-${i}`} id={`netpath-${i}`} d={`M${na.cx},${na.cy} L${nb.cx},${nb.cy}`} fill="none" />;
+                })}
+
+                {nodes.map((n, i) => (
+                    <g key={i}>
+                        {/* Outer glow ring */}
+                        <circle cx={n.cx} cy={n.cy} r={34} fill={n.color} opacity="0.04" />
+                        <circle cx={n.cx} cy={n.cy} r={26} fill="white" stroke={n.color} strokeWidth="1.5" style={{ filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.10))' }} />
+                        <circle cx={n.cx} cy={n.cy} r={9} fill={n.color} />
+                        <text x={n.cx} y={n.cy + 44} textAnchor="middle" fontSize="11" fontWeight="700" fill="#6b7280">{n.label}</text>
+                    </g>
+                ))}
+            </svg>
+        </div>
+    );
+}
+
+// ─── Mini dashboard mockup ────────────────────────────────────────
+function DashboardMockup() {
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            style={{
+                background: '#fff',
+                borderRadius: 20,
+                border: '1px solid rgba(0,0,0,0.08)',
+                boxShadow: '0 24px 64px rgba(0,0,0,0.10)',
+                overflow: 'hidden',
+                maxWidth: 480,
+            }}
+        >
+            {/* Titlebar */}
+            <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', gap: 8, background: '#fafafa' }}>
+                {['#ff5f57', '#ffbd2e', '#28ca41'].map(c => <div key={c} style={{ width: 11, height: 11, borderRadius: '50%', background: c }} />)}
+                <div style={{ flex: 1, height: 22, background: '#f0f2f8', borderRadius: 6, marginLeft: 8, display: 'flex', alignItems: 'center', paddingLeft: 10 }}>
+                    <span style={{ fontSize: 11, color: '#9ca3af' }}>nous.ai / dashboard</span>
+                </div>
+            </div>
+
+            <div style={{ padding: 24 }}>
+                {/* Stat row */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, marginBottom: 20 }}>
+                    {[
+                        { label: 'Agents running', value: '2,841', color: '#6366f1', delta: '+12%' },
+                        { label: 'Avg latency', value: '12ms', color: '#06b6d4', delta: '-3ms' },
+                        { label: 'Uptime', value: '99.9%', color: '#22c55e', delta: 'SLA met' },
+                    ].map(s => (
+                        <div key={s.label} style={{ background: '#f8f9fc', borderRadius: 12, padding: '12px 14px', border: '1px solid rgba(0,0,0,0.05)' }}>
+                            <div style={{ fontSize: 10, color: '#9ca3af', marginBottom: 4, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
+                            <div style={{ fontSize: 20, fontWeight: 900, letterSpacing: '-0.04em', color: s.color }}>{s.value}</div>
+                            <div style={{ fontSize: 10, color: '#22c55e', fontWeight: 600, marginTop: 3 }}>{s.delta}</div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Sparkline chart */}
+                <div style={{ display: 'flex', gap: 3, height: 56, alignItems: 'flex-end', marginBottom: 20 }}>
+                    {[35, 60, 45, 80, 55, 95, 70, 88, 60, 100, 75, 92].map((h, i) => (
+                        <motion.div key={i}
+                            initial={{ height: 0 }}
+                            whileInView={{ height: `${h}%` }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5, delay: i * 0.04 }}
+                            style={{ flex: 1, borderRadius: 4, background: `linear-gradient(to top, #6366f1${i % 2 === 0 ? 'ff' : '88'}, #06b6d433)` }}
+                        />
+                    ))}
+                </div>
+
+                {/* Progress list */}
+                {[
+                    { name: 'AI Product Engineering', pct: 98, color: '#6366f1' },
+                    { name: 'Agentic Automation', pct: 94, color: '#06b6d4' },
+                    { name: 'Data Engineering', pct: 87, color: '#3b82f6' },
+                    { name: 'Quality Engineering', pct: 91, color: '#14b8a6' },
+                ].map(r => (
+                    <div key={r.name} style={{ marginBottom: 12 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>{r.name}</span>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: r.color }}>{r.pct}%</span>
+                        </div>
+                        <div style={{ height: 5, background: '#f0f2f8', borderRadius: 3, overflow: 'hidden' }}>
+                            <motion.div
+                                initial={{ width: 0 }}
+                                whileInView={{ width: `${r.pct}%` }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 1, delay: 0.3 }}
+                                style={{ height: '100%', background: r.color, borderRadius: 3 }}
+                            />
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </motion.div>
+    );
+}
+
+// ─── Stat counter ────────────────────────────────────────────────
+function CountUp({ to, suffix = '' }: { to: number; suffix?: string }) {
+    const [val, setVal] = useState(0);
+    const ref = useRef(null);
+    const inView = useInView(ref, { once: true });
+    useEffect(() => {
+        if (!inView) return;
+        let start = 0;
+        const step = to / 60;
+        const t = setInterval(() => {
+            start += step;
+            if (start >= to) { setVal(to); clearInterval(t); }
+            else setVal(Math.floor(start));
+        }, 16);
+        return () => clearInterval(t);
+    }, [inView, to]);
+    return <span ref={ref}>{val}{suffix}</span>;
+}
 
 export default function SocialProof() {
-    const ref = useRef<HTMLDivElement>(null);
-    const partnersRef = useRef<HTMLDivElement>(null);
-    const statsRef = useRef<HTMLDivElement>(null);
-    const [visible, setVisible] = useState(false);
-    const [partnersVisible, setPartnersVisible] = useState(false);
-    const [statsVisible, setStatsVisible] = useState(false);
-    const [hoveredCase, setHoveredCase] = useState<number | null>(null);
-    const [hoveredPartner, setHoveredPartner] = useState<number | null>(null);
-
-    useEffect(() => {
-        const obs1 = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold: 0.1 });
-        const obs2 = new IntersectionObserver(([e]) => { if (e.isIntersecting) setPartnersVisible(true); }, { threshold: 0.1 });
-        const obs3 = new IntersectionObserver(([e]) => { if (e.isIntersecting) setStatsVisible(true); }, { threshold: 0.1 });
-        if (ref.current) obs1.observe(ref.current);
-        if (partnersRef.current) obs2.observe(partnersRef.current);
-        if (statsRef.current) obs3.observe(statsRef.current);
-        return () => { obs1.disconnect(); obs2.disconnect(); obs3.disconnect(); };
-    }, []);
+    const ref = useRef(null);
+    const inView = useInView(ref, { once: true, margin: '-80px' });
 
     return (
         <>
-            {/* ─── Technology Alliance Partners ─── */}
-            <section
-                ref={partnersRef}
-                style={{
-                    padding: '6rem 0',
-                    background: 'linear-gradient(160deg, #050E1E 0%, #0C1F45 60%, #071428 100%)',
-                    position: 'relative',
-                    overflow: 'hidden',
-                }}
-            >
-                {/* Background grid */}
-                <div style={{
-                    position: 'absolute', inset: 0, pointerEvents: 'none',
-                    backgroundImage: 'linear-gradient(rgba(26,86,219,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(26,86,219,0.06) 1px, transparent 1px)',
-                    backgroundSize: '60px 60px',
-                }} />
-                {/* Glow orbs */}
-                <div style={{ position: 'absolute', top: '-20%', right: '-10%', width: '600px', height: '600px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(26,86,219,0.12) 0%, transparent 70%)', filter: 'blur(60px)', pointerEvents: 'none' }} />
-                <div style={{ position: 'absolute', bottom: '-20%', left: '-10%', width: '500px', height: '500px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(124,58,237,0.10) 0%, transparent 70%)', filter: 'blur(50px)', pointerEvents: 'none' }} />
+            {/* ── Marquee logo bar ─────────────────────────────────── */}
+            <section style={{ padding: '40px 0 48px', background: '#fff', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+                <div style={{ textAlign: 'center', marginBottom: 28 }}>
+                    <p style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af', letterSpacing: '0.09em', textTransform: 'uppercase' }}>
+                        Trusted by the world's leading technology ecosystem
+                    </p>
+                </div>
+                <Marquee />
+            </section>
 
-                <div className="container-nous" style={{ position: 'relative', zIndex: 1 }}>
-                    {/* Header */}
-                    <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-                        <div style={{
-                            display: 'inline-flex', alignItems: 'center', gap: '8px',
-                            background: 'rgba(26,86,219,0.15)', border: '1px solid rgba(96,165,250,0.3)',
-                            borderRadius: '100px', padding: '6px 16px', marginBottom: '1.25rem',
-                        }}>
-                            <Zap size={13} color="#60A5FA" />
-                            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#93C5FD', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Technology Ecosystem</span>
-                        </div>
-                        <h2 style={{
-                            fontSize: 'clamp(1.875rem, 3.5vw, 2.75rem)',
-                            fontWeight: 800, color: '#FFFFFF',
-                            letterSpacing: '-0.03em', lineHeight: 1.15,
-                            marginBottom: '1rem',
-                        }}>
-                            Powered by the World's{' '}
-                            <span style={{ background: 'linear-gradient(135deg, #60A5FA, #A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Leading Platforms</span>
-                        </h2>
-                        <p style={{ fontSize: '1.0625rem', color: '#94A3B8', maxWidth: '560px', margin: '0 auto', lineHeight: 1.7 }}>
-                            Strategic alliances with the world's top technology companies — enabling us to deliver cutting-edge enterprise solutions at scale.
-                        </p>
-                    </div>
-
-                    {/* Ecosystem Stats Strip */}
-                    <div
-                        ref={statsRef}
-                        style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-                            gap: '1rem',
-                            marginBottom: '3.5rem',
-                        }}
-                    >
-                        {ecosystemStats.map((stat, i) => {
-                            const Icon = stat.icon;
-                            return (
-                                <div
-                                    key={stat.label}
-                                    style={{
-                                        background: 'rgba(255,255,255,0.05)',
-                                        border: '1px solid rgba(255,255,255,0.1)',
-                                        borderRadius: '14px',
-                                        padding: '1.25rem',
-                                        textAlign: 'center',
-                                        transition: 'all 0.4s ease',
-                                        opacity: statsVisible ? 1 : 0,
-                                        transform: statsVisible ? 'translateY(0)' : 'translateY(20px)',
-                                        transitionDelay: `${i * 0.08}s`,
-                                        backdropFilter: 'blur(10px)',
-                                    }}
-                                >
-                                    <Icon size={20} color="#60A5FA" style={{ marginBottom: '0.5rem' }} />
-                                    <div style={{ fontSize: '1.875rem', fontWeight: 800, color: '#FFFFFF', lineHeight: 1.1, letterSpacing: '-0.03em' }}>{stat.value}</div>
-                                    <div style={{ fontSize: '0.8rem', color: '#94A3B8', marginTop: '4px', fontWeight: 500 }}>{stat.label}</div>
-                                </div>
-                            );
-                        })}
-                    </div>
-
-                    {/* Partner Cards — premium dark cards with hover glow */}
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-                        gap: '1.25rem',
-                        marginBottom: '3rem',
-                    }}>
-                        {partners.map((p, i) => (
-                            <div
-                                key={p.name}
-                                onMouseEnter={() => setHoveredPartner(i)}
-                                onMouseLeave={() => setHoveredPartner(null)}
+            {/* ── Animated metrics strip ───────────────────────────── */}
+            <section style={{ padding: '64px 0', background: 'linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%)', borderTop: '1px solid rgba(99,102,241,0.08)', borderBottom: '1px solid rgba(99,102,241,0.08)' }}>
+                <div className="container">
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 32 }}>
+                        {[
+                            { value: 200, suffix: '+', label: 'Enterprise clients', sub: 'across 30 countries', color: '#6366f1' },
+                            { value: 2.4, suffix: 'B', label: 'Value delivered', sub: 'in measurable ROI', color: '#3b82f6', prefix: '$' },
+                            { value: 99, suffix: '.9%', label: 'Uptime SLA', sub: 'guaranteed contractually', color: '#06b6d4' },
+                            { value: 10, suffix: '×', label: 'Faster to AI', sub: 'vs traditional consulting', color: '#14b8a6' },
+                        ].map((m) => (
+                            <motion.div
+                                key={m.label}
+                                initial={{ opacity: 0, y: 24 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, margin: '-60px' }}
+                                transition={{ duration: 0.6 }}
                                 style={{
-                                    background: hoveredPartner === i ? p.gradient : 'rgba(255,255,255,0.04)',
-                                    border: `1.5px solid ${hoveredPartner === i ? p.color + '60' : 'rgba(255,255,255,0.08)'}`,
-                                    borderRadius: '16px',
-                                    padding: '1.5rem',
-                                    cursor: 'default',
-                                    transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
-                                    transform: partnersVisible ? (hoveredPartner === i ? 'translateY(-6px)' : 'translateY(0)') : 'translateY(24px)',
-                                    opacity: partnersVisible ? 1 : 0,
-                                    transitionDelay: `${i * 0.06}s`,
-                                    boxShadow: hoveredPartner === i ? `0 20px 60px ${p.color}18, 0 0 0 1px ${p.color}20` : 'none',
-                                    backdropFilter: 'blur(10px)',
-                                    position: 'relative',
-                                    overflow: 'hidden',
+                                    textAlign: 'center', padding: '28px 20px',
+                                    background: '#fff', borderRadius: 16,
+                                    border: `1px solid ${m.color}18`,
+                                    boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
                                 }}
                             >
-                                {/* Glow corner effect */}
-                                {hoveredPartner === i && (
-                                    <div style={{
-                                        position: 'absolute', top: 0, right: 0,
-                                        width: '100px', height: '100px',
-                                        background: `radial-gradient(circle at top right, ${p.color}25, transparent 70%)`,
-                                        pointerEvents: 'none',
-                                    }} />
-                                )}
-
-                                {/* Logo & Name row */}
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1rem' }}>
-                                    <div style={{
-                                        width: '52px', height: '52px', borderRadius: '12px',
-                                        background: `${p.color}18`, border: `1.5px solid ${p.color}35`,
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        fontSize: '1.625rem', flexShrink: 0,
-                                        transition: 'all 0.3s',
-                                        transform: hoveredPartner === i ? 'scale(1.08) rotate(-3deg)' : 'scale(1)',
-                                    }}>
-                                        {p.icon}
-                                    </div>
-                                    <div>
-                                        <div style={{ fontWeight: 700, fontSize: '1rem', color: '#FFFFFF', lineHeight: 1.2, marginBottom: '4px' }}>{p.name}</div>
-                                        <div style={{ fontSize: '0.775rem', color: '#94A3B8' }}>{p.desc}</div>
-                                    </div>
+                                <div style={{
+                                    fontSize: 'clamp(36px,4vw,52px)', fontWeight: 900,
+                                    letterSpacing: '-0.05em', color: m.color, lineHeight: 1,
+                                    marginBottom: 8,
+                                }}>
+                                    {m.prefix}<CountUp to={m.value} suffix={m.suffix} />
                                 </div>
-
-                                {/* Divider */}
-                                <div style={{ height: '1px', background: 'rgba(255,255,255,0.08)', marginBottom: '0.875rem' }} />
-
-                                {/* Tier badge & highlight */}
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '6px' }}>
-                                    <span style={{
-                                        display: 'inline-flex', alignItems: 'center', gap: '5px',
-                                        background: p.tierBg, color: p.tierColor,
-                                        fontSize: '0.7rem', fontWeight: 700,
-                                        padding: '4px 10px', borderRadius: '100px',
-                                        border: `1px solid ${p.tierColor}30`,
-                                        letterSpacing: '0.04em', textTransform: 'uppercase',
-                                    }}>
-                                        <Star size={9} fill="currentColor" />
-                                        {p.tier}
-                                    </span>
-                                    <span style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 500 }}>{p.highlight}</span>
-                                </div>
-                            </div>
+                                <div style={{ fontSize: 15, fontWeight: 700, color: '#0a0f1e', marginBottom: 4 }}>{m.label}</div>
+                                <div style={{ fontSize: 12, color: '#9ca3af' }}>{m.sub}</div>
+                            </motion.div>
                         ))}
-                    </div>
-
-                    {/* Bottom CTA */}
-                    <div style={{ display: 'flex', justifyContent: 'center' }}>
-                        <a
-                            href="/company/partnerships"
-                            style={{
-                                display: 'inline-flex', alignItems: 'center', gap: '8px',
-                                background: 'rgba(255,255,255,0.08)', color: '#E2E8F0',
-                                padding: '0.75rem 1.75rem', borderRadius: '10px',
-                                border: '1px solid rgba(255,255,255,0.15)', fontWeight: 600,
-                                fontSize: '0.9rem', textDecoration: 'none', transition: 'all 0.2s',
-                            }}
-                            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(26,86,219,0.2)'; e.currentTarget.style.borderColor = 'rgba(96,165,250,0.4)'; e.currentTarget.style.color = '#FFFFFF'; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = '#E2E8F0'; }}
-                        >
-                            Explore All Technology Partnerships <ArrowRight size={15} />
-                        </a>
                     </div>
                 </div>
             </section>
 
-            {/* ─── Case Studies ─── */}
-            <section ref={ref} style={{ padding: '6rem 0', background: '#F8FAFC' }}>
-                <div className="container-nous">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '3rem', flexWrap: 'wrap', gap: '1rem' }}>
+            {/* ── Network diagram + text ───────────────────────────── */}
+            <section ref={ref} className="section" style={{ background: '#f8f9fc', overflow: 'hidden' }}>
+                <div className="container">
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center' }}>
                         <div>
-                            <div style={{
-                                display: 'inline-flex', alignItems: 'center', gap: '8px',
-                                background: 'rgba(26,86,219,0.08)', border: '1px solid rgba(26,86,219,0.2)',
-                                borderRadius: '100px', padding: '5px 14px', marginBottom: '1rem',
-                            }}>
-                                <TrendingUp size={12} color="#1A56DB" />
-                                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#1A56DB', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Delivery Proof</span>
+                            <motion.span
+                                initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}}
+                                className="tag" style={{ marginBottom: 20, display: 'inline-flex' }}
+                            >
+                                How it works
+                            </motion.span>
+                            <motion.h2
+                                initial={{ opacity: 0, y: 24 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.1 }}
+                                className="display-md" style={{ color: '#0a0f1e', marginBottom: 16 }}
+                            >
+                                AI that connects{' '}
+                                <span className="grad-text">every layer</span>
+                            </motion.h2>
+                            <motion.p
+                                initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} transition={{ delay: 0.2 }}
+                                className="body-lg" style={{ marginBottom: 32 }}
+                            >
+                                Autonomous agents traverse your enterprise stack — ingesting, processing, and deploying intelligence across every business layer in real time.
+                            </motion.p>
+
+                            {/* Feature bullets */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                                {[
+                                    { dot: '#6366f1', text: 'Sub-50ms inter-agent communication latency' },
+                                    { dot: '#06b6d4', text: 'End-to-end observability across all AI pipelines' },
+                                    { dot: '#22c55e', text: 'Auto-scaling agents with zero cold-start overhead' },
+                                ].map((item) => (
+                                    <div key={item.text} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: item.dot, flexShrink: 0, boxShadow: `0 0 8px ${item.dot}` }} />
+                                        <span style={{ fontSize: 14, color: '#374151', fontWeight: 500 }}>{item.text}</span>
+                                    </div>
+                                ))}
                             </div>
-                            <h2 style={{ fontSize: 'clamp(1.875rem, 3.5vw, 2.625rem)', fontWeight: 800, color: '#0A1628', letterSpacing: '-0.025em', lineHeight: 1.2 }}>
-                                Engineering Outcomes<br />That Speak for Themselves
-                            </h2>
                         </div>
-                        <a
-                            href="/proof/case-studies"
-                            style={{
-                                display: 'inline-flex', alignItems: 'center', gap: '6px',
-                                color: '#1A56DB', fontWeight: 600, fontSize: '0.875rem',
-                                textDecoration: 'none', padding: '0.5rem 1.125rem',
-                                border: '1.5px solid rgba(26,86,219,0.2)', borderRadius: '8px',
-                                transition: 'all 0.2s',
-                            }}
-                            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(26,86,219,0.06)'; e.currentTarget.style.borderColor = '#1A56DB'; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(26,86,219,0.2)'; }}
+                        <motion.div
+                            initial={{ opacity: 0, x: 40 }}
+                            animate={inView ? { opacity: 1, x: 0 } : {}}
+                            transition={{ duration: 0.8, delay: 0.2 }}
                         >
-                            View All Case Studies <ExternalLink size={14} />
-                        </a>
+                            <NetworkDiagram />
+                        </motion.div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                        {caseStudies.map((cs, i) => (
-                            <div
-                                key={cs.title}
-                                onMouseEnter={() => setHoveredCase(i)}
-                                onMouseLeave={() => setHoveredCase(null)}
-                                style={{
-                                    background: 'white',
-                                    border: `1.5px solid ${hoveredCase === i ? cs.color + '44' : cs.color + '18'}`,
-                                    borderRadius: '16px', overflow: 'hidden',
-                                    transition: 'all 0.3s ease',
-                                    opacity: visible ? 1 : 0,
-                                    transform: visible ? (hoveredCase === i ? 'translateY(-6px)' : 'translateY(0)') : 'translateY(28px)',
-                                    transitionDelay: visible ? '0s' : `${i * 0.15}s`,
-                                    cursor: 'pointer',
-                                    boxShadow: hoveredCase === i ? `0 24px 70px ${cs.color}14, 0 4px 20px rgba(0,0,0,0.07)` : '0 2px 12px rgba(0,0,0,0.04)',
-                                }}
-                            >
-                                {/* Colored top bar — expands on hover */}
-                                <div style={{ height: hoveredCase === i ? '6px' : '4px', background: `linear-gradient(90deg, ${cs.color}, ${cs.color}66)`, transition: 'height 0.2s' }} />
-
-                                <div style={{ padding: '1.75rem 2rem' }}>
-                                    <span style={{
-                                        display: 'inline-block', background: cs.bg, color: cs.color,
-                                        fontSize: '0.72rem', fontWeight: 700, padding: '3px 10px',
-                                        borderRadius: '100px', textTransform: 'uppercase',
-                                        letterSpacing: '0.06em', marginBottom: '1rem',
-                                        border: `1px solid ${cs.color}22`,
-                                    }}>
-                                        {cs.industry}
-                                    </span>
-
-                                    <h3 style={{ fontSize: '1.0625rem', fontWeight: 700, color: '#0A1628', lineHeight: 1.35, marginBottom: '0.75rem' }}>
-                                        {cs.title}
-                                    </h3>
-
-                                    <p style={{ fontSize: '0.875rem', color: '#64748B', lineHeight: 1.75, marginBottom: '1.25rem' }}>
-                                        {cs.desc}
-                                    </p>
-
-                                    {/* Technology tags */}
-                                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
-                                        {cs.tech.map((t) => (
-                                            <span key={t} style={{
-                                                fontSize: '0.72rem', fontWeight: 600, color: '#64748B',
-                                                background: '#F1F5F9', padding: '3px 8px',
-                                                borderRadius: '6px', border: '1px solid #E2E8F0',
-                                            }}>{t}</span>
-                                        ))}
+                    {/* ── Dashboard mockup ────────────────────────────── */}
+                    <div style={{ marginTop: 80, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center' }}>
+                        <DashboardMockup />
+                        <motion.div
+                            initial={{ opacity: 0, x: 40 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true, margin: '-80px' }}
+                            transition={{ duration: 0.8, delay: 0.2 }}
+                        >
+                            <span className="tag" style={{ marginBottom: 20, display: 'inline-flex' }}>Live visibility</span>
+                            <h2 className="display-md" style={{ color: '#0a0f1e', marginBottom: 16 }}>
+                                Real-time AI{' '}
+                                <span className="grad-text">command center</span>
+                            </h2>
+                            <p className="body-lg" style={{ marginBottom: 24 }}>
+                                Monitor every agent, latency metric, and deployment across your entire AI stack — from one beautifully unified interface.
+                            </p>
+                            {/* Mini spec list */}
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                                {[
+                                    ['12ms', 'p99 latency'],
+                                    ['99.9%', 'uptime SLA'],
+                                    ['2,841', 'agents active'],
+                                    ['Real-time', 'alerting'],
+                                ].map(([v, l]) => (
+                                    <div key={l} style={{ padding: '14px 16px', borderRadius: 12, background: '#fff', border: '1px solid rgba(0,0,0,0.07)' }}>
+                                        <div style={{ fontSize: 20, fontWeight: 900, color: '#6366f1', letterSpacing: '-0.04em' }}>{v}</div>
+                                        <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 2 }}>{l}</div>
                                     </div>
-
-                                    {/* Metrics */}
-                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', borderTop: '1px solid #F1F5F9', paddingTop: '1.125rem', marginBottom: '1.125rem' }}>
-                                        {cs.metrics.map((m) => (
-                                            <span key={m} style={{
-                                                fontSize: '0.775rem', fontWeight: 600, color: cs.color,
-                                                background: cs.bg, padding: '4px 10px',
-                                                borderRadius: '100px', border: `1px solid ${cs.color}22`,
-                                                display: 'flex', alignItems: 'center', gap: '4px',
-                                            }}>
-                                                <CheckCircle size={11} />
-                                                {m}
-                                            </span>
-                                        ))}
-                                    </div>
-
-                                    <a
-                                        href="/proof/case-studies"
-                                        style={{
-                                            display: 'inline-flex', alignItems: 'center', gap: '5px',
-                                            fontSize: '0.875rem', fontWeight: 600, color: cs.color,
-                                            textDecoration: 'none', transition: 'gap 0.2s',
-                                        }}
-                                        onMouseEnter={(e) => e.currentTarget.style.gap = '10px'}
-                                        onMouseLeave={(e) => e.currentTarget.style.gap = '5px'}
-                                    >
-                                        Read Full Case Study <ArrowRight size={14} />
-                                    </a>
-                                </div>
+                                ))}
                             </div>
-                        ))}
+                        </motion.div>
                     </div>
                 </div>
             </section>

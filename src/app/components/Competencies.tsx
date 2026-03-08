@@ -1,204 +1,158 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { Brain, Cloud, BarChart3, ArrowRight } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { motion, useInView } from 'framer-motion';
+import { Quote, Star } from 'lucide-react';
 
-const competencies = [
-    {
-        icon: Brain,
-        title: 'AI & Automation',
-        headline: 'Intelligence-Driven Enterprise Transformation',
-        description: 'From Generative AI and Agentic AI deployments to ML-powered process automation — we help enterprises build AI capabilities that generate measurable operational advantage.',
-        areas: [
-            { name: 'Generative AI', desc: 'LLM fine-tuning, RAG architectures, and enterprise co-pilots' },
-            { name: 'Agentic AI', desc: 'Autonomous agents for complex multi-step business workflows' },
-            { name: 'Intelligent Automation', desc: 'RPA, intelligent document processing, and workflow orchestration' },
-            { name: 'ML & Data Science', desc: 'Predictive models, recommendation engines, and analytics AI' },
-        ],
-        color: '#7C3AED',
-        gradient: 'linear-gradient(135deg, rgba(124,58,237,0.08) 0%, rgba(91,33,182,0.04) 100%)',
-    },
-    {
-        icon: Cloud,
-        title: 'Cloud',
-        headline: 'Cloud Transformation at Enterprise Scale',
-        description: 'Multi-cloud strategy, migration execution, cloud-native development, and FinOps optimization — across Azure, AWS, Google Cloud, and Salesforce.',
-        areas: [
-            { name: 'Azure', desc: 'Enterprise cloud architecture and Microsoft ecosystem integration' },
-            { name: 'AWS', desc: 'Scalable cloud infrastructure and managed services on Amazon' },
-            { name: 'Google Cloud', desc: 'Data-driven transformation on GCP with BigQuery and Vertex AI' },
-            { name: 'Salesforce', desc: 'CRM platform engineering, integrations, and custom development' },
-        ],
-        color: '#0284C7',
-        gradient: 'linear-gradient(135deg, rgba(2,132,199,0.08) 0%, rgba(3,105,161,0.04) 100%)',
-    },
-    {
-        icon: BarChart3,
-        title: 'Data & Analytics',
-        headline: 'Data Engineering for Smarter Decisions',
-        description: 'Modern data platforms, real-time analytics pipelines, and advanced visualization — turning enterprise data into strategic intelligence.',
-        areas: [
-            { name: 'Modern Data Platforms', desc: 'Data lakes, warehouses, mesh architectures, and pipelines' },
-            { name: 'Advanced Analytics', desc: 'Statistical modeling, predictive analytics, and forecasting' },
-            { name: 'Data Visualization', desc: 'Executive dashboards, BI platforms, and self-service analytics' },
-            { name: 'Data Governance', desc: 'Master data management, lineage, and compliance frameworks' },
-        ],
-        color: '#059669',
-        gradient: 'linear-gradient(135deg, rgba(5,150,105,0.08) 0%, rgba(4,120,87,0.04) 100%)',
-    },
+const testimonials = [
+    { quote: "Nous shipped what would have taken us 18 months — inside 8 weeks. Extraordinary engineers, extraordinary outcomes.", name: 'Sarah Chen', role: 'CTO · NovaBanking UK', avatar: 'SC', color: '#6366f1', industry: 'FinTech' },
+    { quote: "Claims processing went from 14 days to 3 hours. Not incremental improvement — total transformation.", name: 'James Okafor', role: 'Head of Ops · Global Insurer', avatar: 'JO', color: '#06b6d4', industry: 'Insurance' },
+    { quote: "Apple-level engineering quality. Our MLOps infrastructure is now exquisitely scalable for 200+ concurrent models.", name: 'Priya Sharma', role: 'VP Engineering · HealthUnity', avatar: 'PS', color: '#e879f9', industry: 'Healthcare' },
+    { quote: "We didn't get generic AI consulting. Nous redesigned our competitive moat. Worth every penny.", name: 'Marcus Williams', role: 'CEO · RetailIQ', avatar: 'MW', color: '#14b8a6', industry: 'Retail' },
+];
+
+const steps = [
+    { num: '01', title: 'Discovery', desc: '2 weeks', color: '#6366f1' },
+    { num: '02', title: 'Architecture', desc: '3 weeks', color: '#3b82f6' },
+    { num: '03', title: 'Implementation', desc: '8–24 weeks', color: '#06b6d4' },
+    { num: '04', title: 'Operationalize', desc: 'Ongoing', color: '#14b8a6' },
 ];
 
 export default function Competencies() {
-    const ref = useRef<HTMLDivElement>(null);
-    const [visible, setVisible] = useState(false);
-    const [active, setActive] = useState<number | null>(null);
-
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([e]) => { if (e.isIntersecting) setVisible(true); },
-            { threshold: 0.1 }
-        );
-        if (ref.current) observer.observe(ref.current);
-        return () => observer.disconnect();
-    }, []);
+    const ref = useRef(null);
+    const inView = useInView(ref, { once: true, margin: '-80px' });
+    const [active, setActive] = useState(0);
 
     return (
-        <section style={{ padding: '6rem 0', background: 'white' }}>
-            <div className="container-nous" ref={ref}>
-                {/* Header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '3.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-                    <div>
-                        <p className="section-label">Technology Competencies</p>
-                        <div className="divider" />
-                        <h2 style={{
-                            fontSize: 'clamp(1.875rem, 3.5vw, 2.75rem)',
-                            fontWeight: 800,
-                            color: '#0A1628',
-                            letterSpacing: '-0.025em',
-                            maxWidth: '480px',
-                        }}>
-                            The Capabilities That Drive Outcomes
+        <>
+            {/* How it works — visual timeline */}
+            <section id="how-it-works" className="section" style={{ background: '#ffffff', overflow: 'hidden' }}>
+                <div className="container" ref={ref}>
+                    <div style={{ textAlign: 'center', marginBottom: 72 }}>
+                        <motion.span initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} className="tag" style={{ display: 'inline-flex', marginBottom: 20 }}>
+                            Our process
+                        </motion.span>
+                        <motion.h2 initial={{ opacity: 0, y: 24 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.1 }} className="display-lg" style={{ color: '#0a0f1e' }}>
+                            From idea to{' '}
+                            <span className="grad-text">AI-native</span>
+                        </motion.h2>
+                    </div>
+
+                    {/* Timeline card row */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20, position: 'relative' }}>
+                        {/* Connector line */}
+                        <div style={{ position: 'absolute', top: 36, left: '12.5%', right: '12.5%', height: 2, background: 'linear-gradient(90deg, #6366f1, #3b82f6, #06b6d4, #14b8a6)' }} />
+
+                        {steps.map((s, i) => (
+                            <motion.div
+                                key={s.num}
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={inView ? { opacity: 1, y: 0 } : {}}
+                                transition={{ delay: 0.15 + i * 0.1 }}
+                                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}
+                            >
+                                <div style={{
+                                    width: 72, height: 72, borderRadius: '50%',
+                                    background: '#fff',
+                                    border: `2px solid ${s.color}`,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    fontSize: 18, fontWeight: 900, color: s.color,
+                                    boxShadow: `0 4px 20px ${s.color}25`,
+                                    marginBottom: 20, position: 'relative', zIndex: 2,
+                                }}>
+                                    {s.num}
+                                </div>
+                                <div style={{ fontSize: 17, fontWeight: 800, color: '#0a0f1e', marginBottom: 6 }}>{s.title}</div>
+                                <div style={{ fontSize: 12, fontWeight: 600, color: s.color, padding: '4px 12px', borderRadius: 100, background: `${s.color}10`, border: `1px solid ${s.color}25` }}>
+                                    {s.desc}
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Testimonials */}
+            <section id="testimonials" className="section" style={{ background: '#f8f9fc', overflow: 'hidden' }}>
+                <div className="container">
+                    <div style={{ textAlign: 'center', marginBottom: 64 }}>
+                        <span className="tag" style={{ display: 'inline-flex', marginBottom: 20 }}>Customer stories</span>
+                        <h2 className="display-lg" style={{ color: '#0a0f1e' }}>
+                            Outcomes that{' '}
+                            <span className="grad-text">speak</span>
                         </h2>
                     </div>
-                    <div style={{ maxWidth: '360px' }}>
-                        <p style={{ color: '#64748B', lineHeight: 1.75, fontSize: '1rem' }}>
-                            Our competency centers bring together specialized talent, proven methodologies, and modern toolchains — purpose-built for enterprise challenges.
-                        </p>
-                    </div>
-                </div>
 
-                {/* Competency Cards */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                    {competencies.map((comp, i) => (
-                        <div
-                            key={comp.title}
-                            onClick={() => setActive(active === i ? null : i)}
-                            style={{
-                                background: active === i ? comp.gradient : 'white',
-                                border: `1px solid ${active === i ? comp.color + '33' : '#E2E8F0'}`,
-                                borderRadius: '14px',
-                                overflow: 'hidden',
-                                cursor: 'pointer',
-                                transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
-                                opacity: visible ? 1 : 0,
-                                transform: visible ? 'translateY(0)' : 'translateY(24px)',
-                                transitionDelay: `${i * 0.12}s`,
-                                boxShadow: active === i ? `0 20px 60px ${comp.color}0E` : 'none',
-                            }}
-                        >
-                            {/* Header row */}
-                            <div style={{
-                                padding: '2rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '1.5rem',
-                                justifyContent: 'space-between',
-                            }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flex: 1 }}>
-                                    <div style={{
-                                        width: '52px',
-                                        height: '52px',
-                                        borderRadius: '12px',
-                                        background: `${comp.color}14`,
-                                        border: `1px solid ${comp.color}22`,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        flexShrink: 0,
-                                    }}>
-                                        <comp.icon size={24} color={comp.color} />
-                                    </div>
-                                    <div>
-                                        <div style={{
-                                            fontSize: '0.8rem',
-                                            fontWeight: 600,
-                                            color: comp.color,
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '0.08em',
-                                            marginBottom: '2px',
-                                        }}>
-                                            Competency
-                                        </div>
-                                        <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0A1628' }}>
-                                            {comp.title}
-                                        </h3>
-                                    </div>
+                    {/* Featured quote */}
+                    <motion.div
+                        key={active}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4 }}
+                        style={{
+                            background: '#fff',
+                            borderRadius: 24,
+                            padding: '44px 52px',
+                            border: `1px solid ${testimonials[active].color}22`,
+                            boxShadow: `0 20px 60px rgba(0,0,0,0.07), 0 0 0 1px ${testimonials[active].color}15`,
+                            marginBottom: 20,
+                            position: 'relative',
+                            overflow: 'hidden',
+                            borderLeft: `4px solid ${testimonials[active].color}`,
+                        }}
+                    >
+                        <div style={{ position: 'absolute', top: 28, right: 36, opacity: 0.05 }}>
+                            <Quote size={72} color={testimonials[active].color} />
+                        </div>
+
+                        <div style={{ display: 'flex', gap: 4, marginBottom: 18 }}>
+                            {[...Array(5)].map((_, i) => <Star key={i} size={14} fill={testimonials[active].color} color={testimonials[active].color} />)}
+                        </div>
+
+                        <p style={{ fontSize: 22, lineHeight: 1.55, color: '#0a0f1e', fontWeight: 600, letterSpacing: '-0.015em', marginBottom: 32, maxWidth: 700 }}>
+                            &ldquo;{testimonials[active].quote}&rdquo;
+                        </p>
+
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                                <div style={{ width: 44, height: 44, borderRadius: '50%', background: `linear-gradient(135deg, ${testimonials[active].color}, ${testimonials[active].color}88)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, color: '#fff' }}>
+                                    {testimonials[active].avatar}
                                 </div>
-                                <div style={{
-                                    width: '32px',
-                                    height: '32px',
-                                    borderRadius: '8px',
-                                    background: active === i ? comp.color : '#F1F5F9',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    flexShrink: 0,
-                                    transition: 'all 0.25s',
-                                    transform: active === i ? 'rotate(90deg)' : 'rotate(0)',
-                                }}>
-                                    <ArrowRight size={16} color={active === i ? 'white' : '#94A3B8'} />
+                                <div>
+                                    <div style={{ fontWeight: 700, fontSize: 15, color: '#0a0f1e' }}>{testimonials[active].name}</div>
+                                    <div style={{ fontSize: 13, color: '#6b7280' }}>{testimonials[active].role}</div>
                                 </div>
                             </div>
-
-                            {/* Expanded content */}
-                            {active === i && (
-                                <div style={{
-                                    padding: '0 2rem 2rem',
-                                    animation: 'fadeIn 0.3s ease',
-                                }}>
-                                    <p style={{ color: '#475569', lineHeight: 1.75, marginBottom: '2rem', fontSize: '1rem' }}>
-                                        {comp.description}
-                                    </p>
-                                    <div style={{
-                                        display: 'grid',
-                                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                                        gap: '1rem',
-                                    }}>
-                                        {comp.areas.map((area) => (
-                                            <div
-                                                key={area.name}
-                                                style={{
-                                                    background: `${comp.color}0A`,
-                                                    border: `1px solid ${comp.color}18`,
-                                                    borderRadius: '10px',
-                                                    padding: '1.25rem',
-                                                }}
-                                            >
-                                                <div style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0A1628', marginBottom: '0.375rem' }}>
-                                                    {area.name}
-                                                </div>
-                                                <div style={{ fontSize: '0.85rem', color: '#64748B', lineHeight: 1.5 }}>
-                                                    {area.desc}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
+                            <span style={{ fontSize: 11, fontWeight: 700, color: testimonials[active].color, padding: '5px 14px', borderRadius: 100, background: `${testimonials[active].color}10`, border: `1px solid ${testimonials[active].color}25`, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                                {testimonials[active].industry}
+                            </span>
                         </div>
-                    ))}
+                    </motion.div>
+
+                    {/* Selector pills */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+                        {testimonials.map((t, i) => (
+                            <button
+                                key={t.name}
+                                onClick={() => setActive(i)}
+                                style={{
+                                    padding: '14px 18px', borderRadius: 14, textAlign: 'left',
+                                    background: i === active ? '#fff' : 'transparent',
+                                    border: `1.5px solid ${i === active ? `${t.color}35` : 'rgba(0,0,0,0.07)'}`,
+                                    boxShadow: i === active ? `0 4px 20px rgba(0,0,0,0.06)` : 'none',
+                                    cursor: 'pointer', transition: 'all 0.2s',
+                                }}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: `linear-gradient(135deg, ${t.color}, ${t.color}88)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: '#fff' }}>{t.avatar}</div>
+                                    <span style={{ fontSize: 13, fontWeight: 700, color: i === active ? '#0a0f1e' : '#6b7280' }}>{t.name}</span>
+                                </div>
+                                <div style={{ fontSize: 11, color: '#9ca3af' }}>{t.industry}</div>
+                            </button>
+                        ))}
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </>
     );
 }

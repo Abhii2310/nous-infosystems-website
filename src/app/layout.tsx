@@ -1,33 +1,30 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Nous Infosystems – Digital Product Engineering for Complex Enterprises",
-  description: "Nous Infosystems delivers enterprise-grade digital product engineering, AI & automation, cloud transformation, and quality engineering for banking, insurance, healthcare, retail, and logistics industries.",
-  keywords: "Digital Product Engineering, AI Automation, Cloud Transformation, Quality Engineering, CMMI Level 5, Enterprise IT Services",
+  title: "Nous | AI Infrastructure for the Enterprise",
+  description: "Build intelligence into everything. AI-led product engineering, data engineering, agentic automation, quality engineering, and cloud infrastructure.",
+  keywords: ["enterprise AI", "AI transformation", "data engineering", "agentic workflows", "AI infrastructure"],
   openGraph: {
-    title: "Nous Infosystems – Leveraging Intellect",
-    description: "Your partner for digital product engineering in highly regulated industries.",
+    title: "Nous — Build Intelligence Into Everything",
+    description: "AI infrastructure for the next generation of enterprise products.",
     type: "website",
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body>{children}</body>
+      <body className={inter.className} style={{ margin: 0, padding: 0, background: '#fff', overflowX: 'hidden' }}>
+        {children}
+      </body>
     </html>
   );
 }

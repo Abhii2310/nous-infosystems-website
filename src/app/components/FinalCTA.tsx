@@ -1,205 +1,193 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { ArrowRight, ChevronRight } from 'lucide-react';
+import { motion, useInView } from 'framer-motion';
+import { ArrowRight, Mail, MessageCircle } from 'lucide-react';
+import { useRef } from 'react';
+
+const contactOptions = [
+    {
+        icon: MessageCircle,
+        title: 'Book a Discovery Call',
+        desc: '45 min with our principal AI architects — zero sales pitch',
+        cta: 'Schedule now',
+        href: 'mailto:hello@nous.ai',
+        color: '#6366f1',
+        primary: true,
+    },
+    {
+        icon: Mail,
+        title: 'Talk to Sales',
+        desc: 'Enterprise pricing, custom scopes, partnership enquiries',
+        cta: 'Contact sales',
+        href: 'mailto:sales@nous.ai',
+        color: '#06b6d4',
+        primary: false,
+    },
+];
 
 export default function FinalCTA() {
-    const ref = useRef<HTMLDivElement>(null);
-    const [visible, setVisible] = useState(false);
-
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([e]) => { if (e.isIntersecting) setVisible(true); },
-            { threshold: 0.2 }
-        );
-        if (ref.current) observer.observe(ref.current);
-        return () => observer.disconnect();
-    }, []);
+    const ref = useRef(null);
+    const inView = useInView(ref, { once: true, margin: '-80px' });
 
     return (
-        <section
-            id="contact"
-            ref={ref}
-            style={{
-                padding: '7rem 0',
-                background: 'white',
-                position: 'relative',
-                overflow: 'hidden',
-            }}
-        >
-            {/* Background decoration */}
-            <div style={{
-                position: 'absolute',
-                top: '-200px',
-                right: '-200px',
-                width: '600px',
-                height: '600px',
-                borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(26,86,219,0.05) 0%, transparent 70%)',
-                filter: 'blur(60px)',
-            }} />
+        <>
+            {/* ── Big final CTA ── */}
+            <section
+                id="contact"
+                style={{
+                    padding: '140px 0',
+                    background: 'linear-gradient(160deg, #0a0f1e 0%, #131b35 50%, #0c1628 100%)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                }}
+            >
+                {/* Layered background blobs */}
+                <div style={{ position: 'absolute', top: '-15%', left: '5%', width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.18), transparent 70%)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', bottom: '-20%', right: '0%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(6,182,212,0.14), transparent 70%)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%,-50%)', width: 800, height: 400, background: 'radial-gradient(ellipse, rgba(139,92,246,0.08), transparent 60%)', pointerEvents: 'none' }} />
 
-            <div className="container-nous" style={{ position: 'relative', zIndex: 1 }}>
+                {/* Grid texture */}
                 <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: '5rem',
-                    alignItems: 'center',
-                }}>
-                    {/* Left */}
-                    <div style={{
-                        opacity: visible ? 1 : 0,
-                        transform: visible ? 'translateX(0)' : 'translateX(-40px)',
-                        transition: 'all 0.7s ease',
-                    }}>
-                        <p className="section-label" style={{ marginBottom: '0.75rem' }}>Get in Touch</p>
-                        <h2 style={{
-                            fontSize: 'clamp(2rem, 4vw, 3rem)',
-                            fontWeight: 800,
-                            color: '#0A1628',
-                            letterSpacing: '-0.025em',
-                            lineHeight: 1.1,
-                            marginBottom: '1.5rem',
-                        }}>
-                            Start a Conversation<br />
-                            <span className="gradient-text">With Our Engineering Team</span>
-                        </h2>
+                    position: 'absolute', inset: 0,
+                    backgroundImage: 'linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)',
+                    backgroundSize: '56px 56px',
+                    pointerEvents: 'none',
+                }} />
 
-                        <p style={{ color: '#64748B', lineHeight: 1.75, fontSize: '1.0625rem', marginBottom: '2.5rem', maxWidth: '420px' }}>
-                            Whether you're modernizing legacy infrastructure, building a new digital product, or exploring AI capabilities — we'll help you think through it clearly and honestly.
-                        </p>
+                {/* Animated ring */}
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 700, height: 700, borderRadius: '50%', border: '1px solid rgba(99,102,241,0.08)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 500, height: 500, borderRadius: '50%', border: '1px solid rgba(99,102,241,0.12)', pointerEvents: 'none' }} />
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            {[
-                                'No generic pitch decks — we listen first',
-                                'Engineering-led conversations, not sales',
-                                'Honest assessment of fit and feasibility',
-                                'Response within 24 business hours',
-                            ].map((point) => (
-                                <div key={point} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                    <ChevronRight size={16} color="#1A56DB" />
-                                    <span style={{ color: '#475569', fontSize: '0.9375rem', fontWeight: 500 }}>{point}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Right - Form */}
-                    <div
-                        style={{
-                            background: '#F8FAFC',
-                            border: '1px solid #E2E8F0',
-                            borderRadius: '16px',
-                            padding: '2.5rem',
-                            opacity: visible ? 1 : 0,
-                            transform: visible ? 'translateX(0)' : 'translateX(40px)',
-                            transition: 'all 0.7s ease 0.15s',
-                        }}
-                    >
-                        <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0A1628', marginBottom: '0.5rem' }}>
-                            Request a Discovery Call
-                        </h3>
-                        <p style={{ fontSize: '0.875rem', color: '#94A3B8', marginBottom: '2rem' }}>
-                            Typically 30 minutes · Engineering leadership attends
-                        </p>
-
-                        <form
-                            onSubmit={(e) => { e.preventDefault(); alert('Thank you! Our team will reach out within 24 business hours.'); }}
-                            style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}
+                <div className="container" ref={ref} style={{ position: 'relative', zIndex: 10 }}>
+                    <div style={{ textAlign: 'center', marginBottom: 72 }}>
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={inView ? { opacity: 1, scale: 1 } : {}}
+                            transition={{ duration: 0.6 }}
                         >
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                {[
-                                    { id: 'first', label: 'First Name', type: 'text', placeholder: 'John', required: true },
-                                    { id: 'last', label: 'Last Name', type: 'text', placeholder: 'Smith', required: true },
-                                ].map((field) => (
-                                    <div key={field.id}>
-                                        <label htmlFor={`contact-${field.id}`} style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: '#374151', marginBottom: '0.375rem' }}>
-                                            {field.label}
-                                        </label>
-                                        <input
-                                            id={`contact-${field.id}`}
-                                            type={field.type}
-                                            placeholder={field.placeholder}
-                                            required={field.required}
-                                            style={{ width: '100%', padding: '0.75rem 1rem', border: '1.5px solid #E2E8F0', borderRadius: '8px', background: 'white', fontSize: '0.9375rem', fontFamily: 'Inter, sans-serif', color: '#0A1628', outline: 'none', transition: 'border-color 0.15s' }}
-                                            onFocus={(e) => e.target.style.borderColor = '#1A56DB'}
-                                            onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
-                                        />
-                                    </div>
-                                ))}
-                            </div>
+                            <span style={{
+                                display: 'inline-flex', alignItems: 'center', gap: 8,
+                                padding: '6px 16px', borderRadius: 100,
+                                background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)',
+                                fontSize: 12, fontWeight: 700, color: '#a5b4fc',
+                                letterSpacing: '0.07em', textTransform: 'uppercase',
+                                marginBottom: 32,
+                            }}>
+                                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#6366f1', boxShadow: '0 0 8px #6366f1' }} />
+                                Start today
+                            </span>
+                        </motion.div>
 
-                            {[
-                                { id: 'email', label: 'Work Email', type: 'email', placeholder: 'john.smith@company.com', required: true },
-                                { id: 'company', label: 'Company', type: 'text', placeholder: 'Your Organization', required: true },
-                            ].map((field) => (
-                                <div key={field.id}>
-                                    <label htmlFor={`contact-${field.id}`} style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: '#374151', marginBottom: '0.375rem' }}>
-                                        {field.label}
-                                    </label>
-                                    <input
-                                        id={`contact-${field.id}`}
-                                        type={field.type}
-                                        placeholder={field.placeholder}
-                                        required={field.required}
-                                        style={{ width: '100%', padding: '0.75rem 1rem', border: '1.5px solid #E2E8F0', borderRadius: '8px', background: 'white', fontSize: '0.9375rem', fontFamily: 'Inter, sans-serif', color: '#0A1628', outline: 'none', transition: 'border-color 0.15s' }}
-                                        onFocus={(e) => e.target.style.borderColor = '#1A56DB'}
-                                        onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
-                                    />
-                                </div>
-                            ))}
+                        <motion.h2
+                            initial={{ opacity: 0, y: 40 }}
+                            animate={inView ? { opacity: 1, y: 0 } : {}}
+                            transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                            style={{
+                                fontSize: 'clamp(52px, 8vw, 100px)',
+                                fontWeight: 900,
+                                letterSpacing: '-0.05em',
+                                lineHeight: 0.92,
+                                color: '#fff',
+                                marginBottom: 28,
+                            }}
+                        >
+                            Start Building
+                            <br />
+                            <span style={{
+                                background: 'linear-gradient(135deg, #6366f1 0%, #3b82f6 40%, #06b6d4 80%, #14b8a6 100%)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                backgroundClip: 'text',
+                            }}>
+                                the Future.
+                            </span>
+                        </motion.h2>
 
-                            <div>
-                                <label htmlFor="contact-interest" style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: '#374151', marginBottom: '0.375rem' }}>
-                                    Area of Interest
-                                </label>
-                                <select
-                                    id="contact-interest"
-                                    style={{ width: '100%', padding: '0.75rem 1rem', border: '1.5px solid #E2E8F0', borderRadius: '8px', background: 'white', fontSize: '0.9375rem', fontFamily: 'Inter, sans-serif', color: '#0A1628', outline: 'none', cursor: 'pointer' }}
-                                    onFocus={(e) => e.target.style.borderColor = '#1A56DB'}
-                                    onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
-                                >
-                                    <option value="">Select a service area</option>
-                                    <option>Digital Product Engineering</option>
-                                    <option>AI & Automation</option>
-                                    <option>Cloud Transformation</option>
-                                    <option>Quality Engineering</option>
-                                    <option>Infrastructure Management</option>
-                                    <option>Data & Analytics</option>
-                                    <option>Other</option>
-                                </select>
-                            </div>
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={inView ? { opacity: 1, y: 0 } : {}}
+                            transition={{ duration: 0.7, delay: 0.25 }}
+                            style={{ fontSize: 18, color: 'rgba(255,255,255,0.45)', maxWidth: 460, margin: '0 auto 56px', lineHeight: 1.7, fontWeight: 400 }}
+                        >
+                            Join 200+ enterprises already building AI-native operations with Nous.
+                        </motion.p>
 
-                            <div>
-                                <label htmlFor="contact-message" style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: '#374151', marginBottom: '0.375rem' }}>
-                                    Brief Context <span style={{ color: '#94A3B8', fontWeight: 400 }}>(optional)</span>
-                                </label>
-                                <textarea
-                                    id="contact-message"
-                                    placeholder="Describe your challenge or initiative in a few sentences..."
-                                    rows={3}
-                                    style={{ width: '100%', padding: '0.75rem 1rem', border: '1.5px solid #E2E8F0', borderRadius: '8px', background: 'white', fontSize: '0.9375rem', fontFamily: 'Inter, sans-serif', color: '#0A1628', outline: 'none', resize: 'vertical', transition: 'border-color 0.15s' }}
-                                    onFocus={(e) => e.target.style.borderColor = '#1A56DB'}
-                                    onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
-                                />
-                            </div>
-
-                            <button
-                                type="submit"
-                                className="btn-primary"
-                                style={{ width: '100%', justifyContent: 'center', padding: '0.9375rem', fontSize: '1rem' }}
-                            >
-                                Request Discovery Call
-                                <ArrowRight size={17} />
-                            </button>
-
-                            <p style={{ textAlign: 'center', fontSize: '0.8rem', color: '#94A3B8' }}>
-                                No commitment. Engineering-first conversation.
-                            </p>
-                        </form>
+                        {/* CTA cards */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={inView ? { opacity: 1, y: 0 } : {}}
+                            transition={{ duration: 0.7, delay: 0.35 }}
+                            style={{ display: 'flex', gap: 20, justifyContent: 'center', flexWrap: 'wrap' }}
+                        >
+                            {contactOptions.map((opt) => {
+                                const Icon = opt.icon;
+                                return (
+                                    <a key={opt.title} href={opt.href} style={{
+                                        display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
+                                        gap: 12, padding: '28px 32px', borderRadius: 20, width: 280,
+                                        background: opt.primary
+                                            ? 'rgba(99,102,241,0.12)'
+                                            : 'rgba(255,255,255,0.04)',
+                                        border: `1.5px solid ${opt.primary ? 'rgba(99,102,241,0.35)' : 'rgba(255,255,255,0.1)'}`,
+                                        textDecoration: 'none',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.3s ease',
+                                        backdropFilter: 'blur(12px)',
+                                        boxShadow: opt.primary ? '0 8px 40px rgba(99,102,241,0.15)' : 'none',
+                                    }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(-4px)';
+                                            e.currentTarget.style.boxShadow = `0 20px 60px rgba(${opt.primary ? '99,102,241' : '6,182,212'},0.25)`;
+                                            e.currentTarget.style.borderColor = opt.primary ? 'rgba(99,102,241,0.6)' : 'rgba(6,182,212,0.4)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = opt.primary ? '0 8px 40px rgba(99,102,241,0.15)' : 'none';
+                                            e.currentTarget.style.borderColor = opt.primary ? 'rgba(99,102,241,0.35)' : 'rgba(255,255,255,0.1)';
+                                        }}
+                                    >
+                                        <div style={{
+                                            width: 44, height: 44, borderRadius: 12,
+                                            background: `${opt.color}22`, border: `1px solid ${opt.color}44`,
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        }}>
+                                            <Icon size={20} color={opt.color} />
+                                        </div>
+                                        <div>
+                                            <div style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 6 }}>{opt.title}</div>
+                                            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', lineHeight: 1.5 }}>{opt.desc}</div>
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: opt.color, fontSize: 14, fontWeight: 600, marginTop: 4 }}>
+                                            {opt.cta} <ArrowRight size={14} />
+                                        </div>
+                                    </a>
+                                );
+                            })}
+                        </motion.div>
                     </div>
+
+                    {/* Small trust badges */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={inView ? { opacity: 1 } : {}}
+                        transition={{ delay: 0.6 }}
+                        style={{ display: 'flex', gap: 32, justifyContent: 'center', flexWrap: 'wrap', paddingTop: 48, borderTop: '1px solid rgba(255,255,255,0.06)' }}
+                    >
+                        {[
+                            { icon: '🔒', text: 'SOC 2 Type II' },
+                            { icon: '🌍', text: '30+ countries' },
+                            { icon: '⚡', text: '99.9% uptime SLA' },
+                            { icon: '🤝', text: 'Dedicated success manager' },
+                            { icon: '📞', text: '24/7 priority support' },
+                        ].map((b) => (
+                            <div key={b.text} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <span style={{ fontSize: 16 }}>{b.icon}</span>
+                                <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', fontWeight: 500 }}>{b.text}</span>
+                            </div>
+                        ))}
+                    </motion.div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </>
     );
 }
