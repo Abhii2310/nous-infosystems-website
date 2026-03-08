@@ -6,6 +6,8 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Sphere, MeshDistortMaterial, Float, Torus } from '@react-three/drei';
 import * as THREE from 'three';
 import { ArrowRight } from 'lucide-react';
+import { HeroShapes } from '@/components/ui/shape-landing-hero';
+import { renderCanvas, destroyCanvas } from '@/components/ui/canvas';
 
 // ─── Cursor-reactive radial glow ────────────────────────────────
 function CursorGlow() {
@@ -182,6 +184,11 @@ function WordCycle() {
 
 // ─── Main Hero ───────────────────────────────────────────────────
 export default function Hero() {
+    useEffect(() => {
+        renderCanvas();
+        return () => destroyCanvas();
+    }, []);
+
     return (
         <section style={{
             position: 'relative',
@@ -332,15 +339,15 @@ export default function Hero() {
                         <a href="#contact" style={{
                             display: 'inline-flex', alignItems: 'center', gap: 10,
                             padding: '16px 32px', borderRadius: 100,
-                            background: 'linear-gradient(135deg, #6366f1, #3b82f6, #06b6d4)',
+                            background: 'linear-gradient(135deg, #7c3aed, #db2777, #06b6d4)',
                             color: '#fff', textDecoration: 'none',
                             fontWeight: 700, fontSize: 15,
-                            boxShadow: '0 0 40px rgba(99,102,241,0.4), 0 4px 20px rgba(0,0,0,0.3)',
+                            boxShadow: '0 0 40px rgba(124,58,237,0.5), 0 4px 20px rgba(0,0,0,0.3)',
                             transition: 'all 0.3s',
                             border: 'none',
                         }}
-                            onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 0 60px rgba(99,102,241,0.6), 0 8px 32px rgba(0,0,0,0.4)'; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 0 40px rgba(99,102,241,0.4), 0 4px 20px rgba(0,0,0,0.3)'; }}
+                            onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 0 80px rgba(124,58,237,0.7), 0 8px 32px rgba(0,0,0,0.4)'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 0 40px rgba(124,58,237,0.5), 0 4px 20px rgba(0,0,0,0.3)'; }}
                         >
                             Start Building <ArrowRight size={16} />
                         </a>
@@ -382,19 +389,28 @@ export default function Hero() {
                     {/* 3D WebGL */}
                     <Canvas camera={{ position: [0, 0, 7], fov: 42 }} gl={{ antialias: true, alpha: true }}>
                         <ambientLight intensity={1.5} />
-                        <directionalLight position={[4, 6, 4]} intensity={4} color="#6366f1" />
+                        <directionalLight position={[4, 6, 4]} intensity={4} color="#7c3aed" />
                         <directionalLight position={[-4, -2, -4]} intensity={3} color="#06b6d4" />
-                        <pointLight position={[0, 0, 4]} intensity={3} color="#e879f9" />
+                        <pointLight position={[0, 0, 4]} intensity={3} color="#db2777" />
                         <CoreScene />
                     </Canvas>
 
                     {/* Floating pills */}
-                    <StatPill value="2,841" sub="AI agents active" color="#6366f1" style={{ top: '12%', right: '-2%' }} label="" />
+                    <StatPill value="2,841" sub="AI agents active" color="#7c3aed" style={{ top: '12%', right: '-2%' }} label="" />
                     <StatPill value="12ms" sub="p99 latency" color="#06b6d4" style={{ bottom: '22%', right: '-5%' }} label="" />
-                    <StatPill value="3.2B" sub="tokens / day" color="#e879f9" style={{ top: '42%', left: '-4%' }} label="" />
-                    <StatPill value="99.9%" sub="uptime SLA" color="#22c55e" style={{ bottom: '10%', left: '8%' }} label="" />
+                    <StatPill value="3.2B" sub="tokens / day" color="#db2777" style={{ top: '42%', left: '-4%' }} label="" />
+                    <StatPill value="99.9%" sub="uptime SLA" color="#10b981" style={{ bottom: '10%', left: '8%' }} label="" />
                 </motion.div>
             </div>
+
+            {/* Elegant floating shapes overlay */}
+            <HeroShapes />
+
+            {/* Rainbow canvas trail — follows cursor */}
+            <canvas
+                id="nous-canvas"
+                style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 3, opacity: 0.7 }}
+            />
 
             {/* Bottom gradient transition to white */}
             <div style={{
